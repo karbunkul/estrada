@@ -1,0 +1,26 @@
+{
+  "name": "estrada",
+  "version": "0.0.1",
+  "description": "Router helper util based on RegExp",
+  "main": "dist/lib/main.js",
+  "types": "dist/lib/main.d.ts",
+  "scripts": {
+    "start": "nodemon $NODE_DEBUG_OPTION --exec ts-node app.ts",
+    "prepublishOnly": "npm run declaration",
+    "declaration": "rimraf dist && tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^8.0.26",
+    "env2conf": "^0.0.2",
+    "nodemon": "^1.12.0",
+    "rimraf": "^2.6.2",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.5.2"
+  },
+  "keywords": [
+    "router",
+    "helper"
+  ],
+  "author": "Pokhodyun Alexander",
+  "license": "MIT"
+}
