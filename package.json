@@ -1,6 +1,6 @@
 {
   "name": "estrada",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Router helper util based on RegExp",
   "main": "dist/lib/main.js",
   "types": "dist/lib/main.d.ts",

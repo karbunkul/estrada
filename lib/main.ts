@@ -1,35 +1,42 @@
-import {isArray} from "util";
-
 export interface IEstradaRouteInfo {
     route: string;
-    params?: object[];
-    query?: object[]
+    pattern: RegExp;
+    segments: string[];
+    weight: number;
+}
+
+export interface IEstradaRoute {
+    route: string;
+    params: object[];
+    query: object[];
 }
 
 export default class Estrada {
-    private _routes: any;
+    private _routes: object;
+    private _url: string;
 
     constructor(routes: string[] = []) {
-
         let patterns = {};
         routes.forEach((route) => {
-            const pattern = /(:.[^\/]+)/g;
-            route = route.replace(/(|\/)\?.*/, '');
-            let segments = route.split('/').length -1;
-            const regexp = new RegExp(`^${route}$`.replace(pattern, '(.[^/]*)'), 'g');
+            route = route.replace(/^\//, '');
+            const
+                pattern = /(:.[^\/]+)/g,
+                segments = route.split('/'),
+                count = segments.length,
+                regexp = new RegExp(`${route}$`.replace(pattern, '(.[^/]*)'), 'g');
 
-            let routeInfo = {
-                segments: segments,
+            let routeInfo: object = {
                 pattern: regexp,
-                route: route,
+                segments: segments,
+                route: `/${route}`,
             };
 
-            if (!patterns.hasOwnProperty(segments)) {
-                patterns[segments] = [
+            if (!patterns.hasOwnProperty(count)) {
+                patterns[count] = [
                     routeInfo
                 ];
             }else {
-                patterns[segments].push(routeInfo);
+                patterns[count].push(routeInfo);
             }
         });
         this._routes = patterns;
@@ -39,43 +46,101 @@ export default class Estrada {
         return this._routes;
     }
 
-    public match(url: string): object | boolean {
-        let routeInfo: object;
-        // get raw query
-        const rawQuery = url.replace(/(.*)\?(.*)/, '$2') || undefined;
-
-        url = url.replace(/(|\/)\?.*/, '');
-        const segments = url.split('/').length - 1;
-        let resolved = false;
-        if (this.routes.hasOwnProperty(segments)) {
-            this.routes[segments].forEach((route) => {
-                if (!resolved) {
-                    let matched = url.match(route.pattern);
-                    if (matched) {
-                        resolved = true;
-                        routeInfo = {
-                            ...route,
-                            query: this.parseQuery(rawQuery),
-                        };
-                    }
-                }
-
+    public match(url: string): IEstradaRoute | boolean {
+        this._url = url;
+        url = url
+            .trim()
+            .replace(/^(\/)/, '')
+            .replace(/(|\/)\?.*/, '');
+        const parts = url.split('/'),
+            count = parts.length;
+        let matches = [];
+        if (this.routes.hasOwnProperty(count)) {
+            this.routes[count].forEach((route) => {
+                let matched = url.match(route.pattern);
+                if (matched) matches.push(route);
             });
+        }else {
+            return false;
         }
-        return (routeInfo) ? routeInfo : false;
+        return this.findRoute(parts, matches);
     }
 
-    private parseQuery(raw: string = ''): object {
-        let query: object = {};
-        raw.split('&').forEach((arg) =>{
+    /**
+     * Parse query from url string
+     * @param {string} raw
+     * @returns {Object}
+     */
+    private parseQuery(): object[] {
+        let query: object[] = [];
+        this._url
+            .replace(/^.*\?/, '')
+            .split('&')
+            .forEach((arg) =>{
             let pair = arg.split('=');
-            if (pair.length == 2) query[pair[0]] = pair[1];
+            if (pair.length == 2) query.push({
+                name: pair[0],
+                value: pair[1]
+            });
         });
         return query;
     }
 
-    private parseParams(url: string, regexp: RegExp): object {
-        let params: object = {};
+    private parseParams(parts: string[], segments: string[]): object[] {
+        let params: object[] = [];
+        segments.forEach((segment, index) =>{
+            if (segment.charAt(0) == ':') {
+                params.push({
+                    name: segment.substr(1),
+                    value: parts[index],
+                });
+            }
+        });
         return params;
+    }
+
+    /**
+     * Sort routes by weight
+     * @param {IEstradaRouteInfo[]} suggested
+     * @returns {Object}
+     */
+    private sortByWeight(suggested: IEstradaRouteInfo[]): IEstradaRouteInfo {
+        suggested.sort((a, b) =>{
+            return (b.weight - a.weight);
+        });
+        return suggested[0];
+    }
+
+    private findRoute(parts: string[], routes: IEstradaRouteInfo[]): IEstradaRoute | boolean {
+        switch (routes.length) {
+            case 0: return false;
+            default: {
+                routes.forEach((routeInfo) => {
+                    routeInfo.weight = this.calcSuggestedWeight(parts, routeInfo.segments);
+                });
+                const route = this.sortByWeight(routes);
+                return {
+                    route: route.route,
+                    query: this.parseQuery(),
+                    params: this.parseParams(parts, route.segments),
+                };
+            }
+        }
+    }
+
+    private calcSuggestedWeight(parts: string[], route: string[]): number {
+        let weight = 0;
+        parts.forEach((part, index) => {
+            if (part == route[index]) {
+                weight+= 400;
+            }else {
+                if (route[index].charAt(0) != ':') {
+                    weight-= 400;
+                }else {
+                    weight+= 100;
+                }
+            }
+        });
+        return weight;
     }
 }
