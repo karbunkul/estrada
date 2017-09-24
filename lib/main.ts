@@ -86,6 +86,12 @@ export default class Estrada {
         return query;
     }
 
+    /**
+     * Parse params from url string
+     * @param {string[]} parts
+     * @param {string[]} segments
+     * @returns {Object[]}
+     */
     private parseParams(parts: string[], segments: string[]): object[] {
         let params: object[] = [];
         segments.forEach((segment, index) =>{
@@ -114,10 +120,19 @@ export default class Estrada {
     private findRoute(parts: string[], routes: IEstradaRouteInfo[]): IEstradaRoute | boolean {
         switch (routes.length) {
             case 0: return false;
+            case 1: {
+                return {
+                    route: routes[0].route,
+                    query: this.parseQuery(),
+                    params: this.parseParams(parts, routes[0].segments),
+                };
+            }
             default: {
+                // calc suggested weight
                 routes.forEach((routeInfo) => {
                     routeInfo.weight = this.calcSuggestedWeight(parts, routeInfo.segments);
                 });
+                // sort by weight and get route
                 const route = this.sortByWeight(routes);
                 return {
                     route: route.route,
@@ -128,6 +143,12 @@ export default class Estrada {
         }
     }
 
+    /**
+     * Calculate suggested weight
+     * @param {string[]} parts
+     * @param {string[]} route
+     * @returns {number}
+     */
     private calcSuggestedWeight(parts: string[], route: string[]): number {
         let weight = 0;
         parts.forEach((part, index) => {
