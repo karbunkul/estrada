@@ -1,5 +1,7 @@
 # Estrada #
 
+[![Build Status](https://travis-ci.org/karbunkul/estrada.svg?branch=master)](https://travis-ci.org/karbunkul/estrada)
+
 ## Synopsis
 Lightweight isomorphic javascript router
 
