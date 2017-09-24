@@ -5,7 +5,7 @@
 ## Synopsis
 Lightweight isomorphic javascript router
 
-[![NPM](https://nodei.co/npm/estarada.png)](https://nodei.co/npm/estrada)
+[![NPM](https://nodei.co/npm/estrada.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/estrada/)
 
 ## API reference
 
@@ -37,6 +37,7 @@ const estrada = required('estrada');
 const routes = [
     '/:city/product/:name',
     '/alive',
+    '/:city',
     '/user/:user',
     '/user/:user/delete',
 ];

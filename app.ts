@@ -4,14 +4,10 @@ import {IncomingMessage, ServerResponse} from 'http';
 
 const routes = [
     '/:city/product/:name',
-    '/ra/product/:name',
-    '/ra/product/ra.entities',
-    '/v2/ra/user/:id/delete',
-    '/ig/:id',
-    '/:id',
     '/alive',
+    '/:city',
     '/user/:user',
-    '/user/1'
+    '/user/:user/delete',
 ];
 
 const estrada = new Estrada(routes);
