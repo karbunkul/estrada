@@ -3,7 +3,7 @@
 ## Synopsis
 Lightweight isomorphic javascript router
 
-[![NPM](https://nodei.co/npm/ra.png)](https://nodei.co/npm/ra)
+[![NPM](https://nodei.co/npm/estarada.png)](https://nodei.co/npm/estrada)
 
 ## API reference
 
