@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
+    "module": "es6",
     "moduleResolution": "node",
     "declaration": true,
     "outDir": "dist",
@@ -10,7 +10,7 @@
       "node"
     ],
     "removeComments": true,
-    "pretty": false,
+    "pretty": true,
     "typeRoots": [
       "node_modules/@types"
     ]

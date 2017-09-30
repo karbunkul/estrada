@@ -11,7 +11,7 @@ export interface IEstradaRoute {
     query: object[];
 }
 
-export default class Estrada {
+class Estrada {
     private _routes: object;
     private _url: string;
 
@@ -165,3 +165,7 @@ export default class Estrada {
         return weight;
     }
 }
+
+module.exports = function (routes: string[] ): Estrada {
+    return new Estrada(routes);
+};

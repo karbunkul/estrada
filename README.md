@@ -42,11 +42,11 @@ const routes = [
     '/user/:user/delete',
 ];
 
-const estrada = new Estrada(routes);
+const router = estrada(routes);
 ```
 Find route by url.
 ```javascript
-estrada.match(url);
+router.match(url);
 ```
 
 © Alexander Pokhodyun (Karbunkul) 2017

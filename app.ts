@@ -1,6 +1,7 @@
-import * as http from 'http';
-import Estrada from './lib/main';
-import {IncomingMessage, ServerResponse} from 'http';
+import {IncomingMessage, ServerResponse} from "http";
+
+const http = require('http');
+const estrada = require('./lib/main');
 
 const routes = [
     '/:city/product/:name',
@@ -10,11 +11,11 @@ const routes = [
     '/user/:user/delete',
 ];
 
-const estrada = new Estrada(routes);
+const router = estrada(routes);
 
 const server = http.createServer((req: IncomingMessage, res: ServerResponse) => {
     const url = (req.method == 'GET') ? decodeURI(req.url) : req.url,
-        response = estrada.match(url);
+        response = router.match(url);
     res.writeHead(200, {'Content-Type': 'application/json'});
     res.end(JSON.stringify(response));
 });

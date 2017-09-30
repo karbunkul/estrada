@@ -1,6 +1,6 @@
 {
   "name": "estrada",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Router helper util",
   "main": "dist/lib/main.js",
   "types": "dist/lib/main.d.ts",
