@@ -32,11 +32,16 @@ Create instance Estrada.
 
 ```javascript
 
-const estrada = required('estrada');
+const estrada = required('estrada', {
+    onError: (err) => console.warn(err),
+});
 
 const routes = [
     '/:city/product/:name',
-    '/alive',
+    {
+        route: '/alive',
+        meta: {foo: 'bar'}
+    },
     '/:city',
     '/user/:user',
     '/user/:user/delete',

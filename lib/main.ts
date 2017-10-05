@@ -2,6 +2,7 @@ export interface IEstradaRouteInfo {
     route: string;
     pattern: RegExp;
     segments: string[];
+    meta: any;
     weight: number;
 }
 
@@ -9,35 +10,62 @@ export interface IEstradaRoute {
     route: string;
     params: object[];
     query: object[];
+    meta: any;
+}
+
+export interface IEstradaOptions {
+    onError?: Function;
 }
 
 class Estrada {
     private _routes: object;
     private _url: string;
+    private _onError: Function;
 
-    constructor(routes: string[] = []) {
+    constructor(routes: any[] = [], options?: IEstradaOptions) {
         let patterns = {};
-        routes.forEach((route) => {
-            route = route.replace(/^\//, '');
-            const
-                pattern = /(:.[^\/]+)/g,
-                segments = route.split('/'),
-                count = segments.length,
-                regexp = new RegExp(`${route}$`.replace(pattern, '(.[^/]*)'), 'g');
-
-            let routeInfo: object = {
-                pattern: regexp,
-                segments: segments,
-                route: `/${route}`,
-            };
-
-            if (!patterns.hasOwnProperty(count)) {
-                patterns[count] = [
-                    routeInfo
-                ];
-            }else {
-                patterns[count].push(routeInfo);
+        let route: string = '';
+        let meta: any = {};
+        let invalid = false;
+        this._onError = (options) ? options.onError : undefined;
+        routes.forEach((item) => {
+            if ((typeof item == 'object')) {
+                if (item.hasOwnProperty('route') && item.hasOwnProperty('meta')) {
+                    route = item.route;
+                    meta = item.meta;
+                }else{
+                    invalid = true;
+                }
             }
+            if (!invalid) {
+                route = route.replace(/^\//, '');
+                const
+                    pattern = /(:.[^\/]+)/g,
+                    segments = route.split('/'),
+                    count = segments.length,
+                    regexp = new RegExp(`${route}$`.replace(pattern, '(.[^/]*)'), 'g');
+
+                let routeInfo: object = {
+                    pattern: regexp,
+                    segments: segments,
+                    route: `/${route}`,
+                    meta: meta,
+                };
+
+                if (!patterns.hasOwnProperty(count)) {
+                    patterns[count] = [
+                        routeInfo
+                    ];
+                }else {
+                    patterns[count].push(routeInfo);
+                }
+            }else {
+                this.onError(`invalid route ${JSON.stringify(item)}`);
+            }
+
+            meta = {};
+            route = '';
+            invalid = false;
         });
         this._routes = patterns;
     }
@@ -77,12 +105,12 @@ class Estrada {
             .replace(/^.*\?/, '')
             .split('&')
             .forEach((arg) =>{
-            let pair = arg.split('=');
-            if (pair.length == 2) query.push({
-                name: pair[0],
-                value: pair[1]
+                let pair = arg.split('=');
+                if (pair.length == 2) query.push({
+                    name: pair[0],
+                    value: pair[1]
+                });
             });
-        });
         return query;
     }
 
@@ -125,6 +153,7 @@ class Estrada {
                     route: routes[0].route,
                     query: this.parseQuery(),
                     params: this.parseParams(parts, routes[0].segments),
+                    meta: routes[0].meta,
                 };
             }
             default: {
@@ -138,6 +167,7 @@ class Estrada {
                     route: route.route,
                     query: this.parseQuery(),
                     params: this.parseParams(parts, route.segments),
+                    meta: route.meta,
                 };
             }
         }
@@ -164,8 +194,12 @@ class Estrada {
         });
         return weight;
     }
+
+    private onError(err: string|Error) {
+        if (this._onError) this._onError(err);
+    }
 }
 
-module.exports = function (routes: string[] ): Estrada {
-    return new Estrada(routes);
+module.exports = function (routes: any[], options?: IEstradaOptions ): Estrada {
+    return new Estrada(routes, options);
 };

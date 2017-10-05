@@ -5,13 +5,16 @@ const estrada = require('./lib/main');
 
 const routes = [
     '/:city/product/:name',
-    '/alive',
+    {
+        route:'/alive',
+        meta: {foo: 'bar'}
+    },
     '/:city',
     '/user/:user',
     '/user/:user/delete',
 ];
 
-const router = estrada(routes);
+const router = estrada(routes, {onError:(err) => console.warn(err)});
 
 const server = http.createServer((req: IncomingMessage, res: ServerResponse) => {
     const url = (req.method == 'GET') ? decodeURI(req.url) : req.url,
