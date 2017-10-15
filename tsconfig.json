@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "es6",
+    "module": "umd",
     "moduleResolution": "node",
     "declaration": true,
     "outDir": "dist",
