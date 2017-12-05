@@ -1,6 +1,7 @@
 # Estrada #
 
 [![Build Status](https://travis-ci.org/karbunkul/estrada.svg?branch=master)](https://travis-ci.org/karbunkul/estrada)
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 ## Synopsis
 Lightweight isomorphic javascript router
@@ -11,20 +12,9 @@ Lightweight isomorphic javascript router
 
 ### `match(url)`
 
-* `url`: **required** url string (for example req.url)
+* `url`: **required** url string (for example '/alive')
 
-Return IEstradaRoute object or false.
-
-## Types ##
-
-### IEstradaRoute ###
-```
-{
-    "route": string,
-    "query": object[],
-    "params": object[],
-}
-```
+Return route object or false.
 
 ## How to use
 
@@ -32,25 +22,18 @@ Create instance Estrada.
 
 ```javascript
 
-const estrada = required('estrada', {
-    onError: (err) => console.warn(err),
-});
+const estrada = require('estrada');
 
 const routes = [
-    '/:city/product/:name',
     {
         route: '/alive',
         meta: {foo: 'bar'}
     },
-    '/:city',
     '/user/:user',
     '/user/:user/delete',
 ];
 
 const router = estrada(routes);
-```
-Find route by url.
-```javascript
 router.match(url);
 ```
 

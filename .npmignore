@@ -1,3 +1,5 @@
 node_modules
-app.ts
-dist/app.js
+index.js
+.idea
+.travis.yml
+.editorconfig
